@@ -18,12 +18,13 @@ def Main():
             print("Invalid Input. Please enter a number")
 
     transactions = []
-    categories = ["food", "rent", "transport", "clothes", "miscellaneous"]
+    i_categories = ["salary", "allowance", "business", "other"]
+    e_categories = ["food", "rent", "transport", "clothes", "miscellaneous"]
     limits = {}
 
-    print("Set your budget limits:")
+    print("Set your budget limits")
 
-    for category in categories:
+    for category in e_categories:
         try:
             amount = float(input(f"Enter limit for {category}: "))
         except:
@@ -39,38 +40,45 @@ def Main():
         print("2. Add Expenses")
         print("3. View Balance")
         print("4. View Transactions")
-        print("5. Forecast Future Balance")
-        print("6. Save data")
-        print("7. Load data")
-        print("8. Spending Analysis")
-        print("9. Exit")
+        print("5. Filter transactions")
+        print("6. Forecast Future Balance")
+        print("7. Save data")
+        print("8. Load data")
+        print("9. Spending Analysis")
+        print("10. Exit")
 
-        choice = input('Enter choice:')
+        choice = input('Enter option (1-10):')
         if choice == "1":
             try:
                 amount = float(input('Enter income amount:'))
             except:
                 print("Invalid!, Enter a number")
                 continue
-            category = input('Enter Category (salary, allowance):')
+
+            print("Income categories:", i_categories)
+            income_type = input('Enter income type: ').strip().lower()
+
+            if income_type not in i_categories:
+                print("Invalid category")
+                continue
             balance = balance + amount
-            transactions.append(("Income", amount, category))
+            transactions.append(("Income", amount, income_type))
 
         elif choice == '2':
             try:
-                amount=float(input('Enter expenses amount:'))
+                amount = float(input('Enter expenses amount:'))
             except:
                 print("Invalid!, Enter a number")
                 continue
 
+            print("Expense categories:", e_categories)
+            category = input('Enter expense category: ').strip().lower()
 
-            print("Categories:", categories)
-            category=input('Enter category:').strip().lower()
-            if category not in categories:
-                print("Invalid category!, Choose from:",categories)
+            if category not in e_categories:
+                print("Invalid category! Choose from:",e_categories)
                 continue
-            balance-=amount
-            transactions.append(("Expense", amount,category))
+            balance -= amount
+            transactions.append(("Expense", amount, category))
 
             if category in limits:
                 total = 0
@@ -82,17 +90,31 @@ def Main():
                 if total > limits[category]:
                     print("Warning: You have exceeded your budget for", category)
 
-
         elif choice == '3':
             print(name, "'s Current Balance", balance)
 
-        elif choice == "4":
-            for t in transactions:
-                print("Type:", t[0])
-                print("Amount:", t[1])
-                print('Category:', t[2])
+        elif choice == '4':
+            if len(transactions) == 0:
+                print("** no transactions recorded; make a transaction to view this data **")
+
+            else:       
+                print("\n--- Transactions ---")
+                for t in transactions:
+                    print(f"{t[0]} | Amount: {t[1]} | Category: {t[2]}")
 
         elif choice == '5':
+            category = input("Enter category to filter: ").strip().lower()
+
+            found = False
+            for t in transactions:
+                if t[0] == "Expense" and t[2] == category:
+                    print(f"{t[0]} | {t[1]} | {t[2]}")
+                    found = True
+
+            if not found:
+                print("No transactions found for this category")
+
+        elif choice == '6':
             try:
                 months = int(input("Enter the number of months: "))
             except:
@@ -112,26 +134,25 @@ def Main():
                 monthly_expense = 0
 
             future = forecast(balance, months, monthly_income, monthly_expense)
-            print('Estimated future balance: ', future)
+            print('Estimated future balance after', months, 'months:', future)
 
-        elif choice == '6':
+        elif choice == '7':
             with open('finance_data.txt', 'w') as file:
                 for t in transactions:
-                    line = t[0] + ', ' + str(t[1]) + ', ' + t[2]+ "\n"
-                    file.write(line)
+                    file.write(f"{t[0]},{t[1]},{t[2]}\n")
 
                 print('Data successfully saved')
 
-        elif choice == '7':
+        elif choice == '8':
             balance = 0.0
             transactions = []
             try:
                 with open('finance_data.txt', 'r') as file:
                     for line in file:
                         data = line.strip().split(",")
-                        t_type = data[0]
-                        amount = float(data[1])
-                        category = data[2]
+                        t_type = data[0].strip()
+                        amount = float(data[1].strip())
+                        category = data[2].strip()
                         transactions.append((t_type, amount, category))
 
                         if t_type == "Income":
@@ -143,9 +164,13 @@ def Main():
             except:
                 print("No saved file")
 
-        elif choice == '8':
-            spending_analysis(transactions)
         elif choice == '9':
+            if len(transactions) == 0:
+                print("No data to analyse.")
+            else:
+                spending_analysis(transactions)
+
+        elif choice == '10':
             print("Exiting. Goodbye")
             break
 
