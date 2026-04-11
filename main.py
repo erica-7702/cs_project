@@ -18,13 +18,13 @@ def Main():
             print("Invalid Input. Please enter a number")
 
     transactions = []
-    i_categories = ["salary", "allowance", "business", "other"]
-    e_categories = ["food", "rent", "transport", "clothes", "miscellaneous"]
+    income_type = ["salary", "allowance", "business", "other"]
+    categories = ["food", "rent", "transport", "clothes", "miscellaneous"]
     limits = {}
 
     print("Set your budget limits")
 
-    for category in e_categories:
+    for category in categories:
         try:
             amount = float(input(f"Enter limit for {category}: "))
         except:
@@ -55,10 +55,10 @@ def Main():
                 print("Invalid!, Enter a number")
                 continue
 
-            print("Income categories:", i_categories)
+            print("Income categories:", income_type)
             income_type = input('Enter income type: ').strip().lower()
 
-            if income_type not in i_categories:
+            if income_type not in income_type:
                 print("Invalid category")
                 continue
             balance = balance + amount
@@ -71,11 +71,11 @@ def Main():
                 print("Invalid!, Enter a number")
                 continue
 
-            print("Expense categories:", e_categories)
+            print("Expense categories:", categories)
             category = input('Enter expense category: ').strip().lower()
 
-            if category not in e_categories:
-                print("Invalid category! Choose from:",e_categories)
+            if category not in categories:
+                print("Invalid category! Choose from:", categories)
                 continue
             balance -= amount
             transactions.append(("Expense", amount, category))
@@ -97,7 +97,7 @@ def Main():
             if len(transactions) == 0:
                 print("** no transactions recorded; make a transaction to view this data **")
 
-            else:       
+            else:
                 print("\n--- Transactions ---")
                 for t in transactions:
                     print(f"{t[0]} | Amount: {t[1]} | Category: {t[2]}")
