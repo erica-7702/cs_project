@@ -1,5 +1,6 @@
 from analysis import spending_analysis
 
+import file_handler
 def forecast(balance, months, monthly_income, monthly_expense):
     for i in range(months):
         balance += monthly_income - monthly_expense
@@ -16,7 +17,6 @@ def Main():
             break
         except:
             print("Invalid Input. Please enter a number")
-
     transactions = []
     income_type = ["salary", "allowance", "business", "other"]
     categories = ["food", "rent", "transport", "clothes", "miscellaneous"]
@@ -56,13 +56,13 @@ def Main():
                 continue
 
             print("Income categories:", income_type)
-            income_type = input('Enter income type: ').strip().lower()
+            income = input('Enter income type: ').strip().lower()
 
-            if income_type not in income_type:
+            if income not in income_type:
                 print("Invalid category")
                 continue
             balance = balance + amount
-            transactions.append(("Income", amount, income_type))
+            transactions.append(("Income", amount, income))
 
         elif choice == '2':
             try:
@@ -137,32 +137,12 @@ def Main():
             print('Estimated future balance after', months, 'months:', future)
 
         elif choice == '7':
-            with open('finance_data.txt', 'w') as file:
-                for t in transactions:
-                    file.write(f"{t[0]},{t[1]},{t[2]}\n")
-
-                print('Data successfully saved')
+            file_handler.save_data(transactions)
+            
 
         elif choice == '8':
-            balance = 0.0
-            transactions = []
-            try:
-                with open('finance_data.txt', 'r') as file:
-                    for line in file:
-                        data = line.strip().split(",")
-                        t_type = data[0].strip()
-                        amount = float(data[1].strip())
-                        category = data[2].strip()
-                        transactions.append((t_type, amount, category))
-
-                        if t_type == "Income":
-                            balance += amount
-                        else:
-                            balance -= amount
-
-                print("Data successfully loaded")
-            except:
-                print("No saved file")
+            transactions, balance = file_handler.load_data()
+            
 
         elif choice == '9':
             if len(transactions) == 0:
@@ -174,7 +154,7 @@ def Main():
             print("Exiting. Goodbye")
             break
 
-        else:  
+        else:
             print('Invalid Input')
 
 Main()
